@@ -1,0 +1,711 @@
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <style>
+        body {
+            overflow: hidden;
+        }
+
+        .magnet {
+            width: 200px;
+            height: 200px;
+            border: solid 1px;
+            position: absolute;
+            cursor: grab;
+            background-color: whitesmoke;
+        }
+
+        .close {
+            cursor: cell;
+            width: 15px;
+            height: 15px;
+            background-color: red;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+
+        .resize {
+            cursor: nwse-resize;
+            width: 25px;
+            height: 25px;
+            background-color: yellow;
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+        }
+
+        .edit {
+            cursor: cell;
+            width: 25px;
+            height: 25px;
+            background-color: blue;
+            position: absolute;
+            top: 0px;
+            left: 00px;
+        }
+
+        .mce-tinymce {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+
+        }
+
+        .exitButton {
+            position: absolute !important;
+            bottom: 2px !important;
+            right: 50px !important;
+            height: 30px !important;
+            width: 30px !important;
+            background-color: crimson !important;
+        }
+
+        .saveButton {
+            position: absolute !important;
+            bottom: 2px !important;
+            right: 100px !important;
+            height: 30px !important;
+            width: 30px !important;
+            background-color: cornflowerblue !important;
+        }
+
+        .dialog {
+            display: none;
+        }
+
+        #przebieg {
+            position: absolute;
+            top: 20px;
+            right: 10px;
+
+        }
+
+        #przebieg::before {
+            content: 'Przebieg';
+            position: absolute;
+            left: -80px;
+            display: block;
+        }
+
+        #actual {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+
+        }
+
+        #actual::before {
+            content: 'Aktualnie';
+            position: absolute;
+            left: -80px;
+            display: block;
+        }
+
+        #canvasia {
+            display: none;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        #addNewMagnes {
+            display: none;
+            position: absolute;
+            width: 160px;
+            height: 30px;
+            background-color: crimson;
+            border: groove darkred 2px;
+            border-radius: 10px;
+            text-align: center;
+            color: whitesmoke;
+            box-sizing: border-box;
+            padding-top: 2px;
+            font-size: 20px;
+        }
+
+        #szukajka {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 450px;
+            height: 50px;
+            border: 2px groove crimson;
+        }
+
+        #butonik_szukaj {
+            cursor: pointer;
+            width: 52px;
+            height: 52px;
+            background-color: crimson;
+            color: whitesmoke;
+            position: absolute;
+            top: 50% !important;
+            left: 61% !important;
+            box-sizing: border-box;
+            padding-top: 13px;
+            text-align: center;
+            font-size: 20px;
+            transform: translateY(-50%) !important;
+        }
+
+        .teksiock {
+            box-sizing: border-box;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="js/tinymce.min.js">
+    </script>
+    <script>
+        function moveMulti(tabI, tabX, tabY) {
+            let obj = {
+                action: 4,
+                nazwa: fridge.nazwa,
+                i: tabI,
+                x: tabX,
+                y: tabY,
+            }
+            callAJAX(obj, 4)
+
+        }
+
+        function createNewElemento() {
+            let obj = {
+                action: 1,
+                nazwa: fridge.nazwa,
+            }
+            callAJAX(obj, 1)
+        }
+
+        function sendUpdatePos(x, y, i) {
+            let obj = {
+                action: 2,
+                nazwa: fridge.nazwa,
+                x: x,
+                y: y,
+                i: i,
+            }
+            callAJAX(obj, 2)
+        }
+
+        function sendUpdateResize(width, height, i) {
+            let obj = {
+                action: 2,
+                nazwa: fridge.nazwa,
+                width: width,
+                height: height,
+                i: i,
+            }
+            callAJAX(obj, 2)
+        }
+
+        function sendUpdateContent(content, i) {
+            let obj = {
+                action: 2,
+                nazwa: fridge.nazwa,
+                content: content,
+                i: i,
+            }
+            callAJAX(obj, 2)
+        }
+
+        function sendDeleteMagnet(i) {
+            let obj = {
+                action: 3,
+                nazwa: fridge.nazwa,
+                i: i,
+            }
+            callAJAX(obj, 3)
+        }
+
+        function callAJAX(formData, action) {
+
+            let xhr = new XMLHttpRequest();
+            console.log(formData)
+
+            //typ połączenia, url, czy asynchroniczen
+            xhr.open("POST", "/odbierz", true);
+
+            //tego nagłówka już nie potrzebujemy
+            xhr.setRequestHeader("Content-type", "application/json");
+            formData = JSON.stringify(formData)
+            xhr.addEventListener('load', function () {
+                if (this.status === 200) {
+                    const json = JSON.parse(this.responseText);
+
+                    if (action == 0) {
+                        console.log(action)
+                        init()
+                        init2(json)
+                    }
+                    else if (action == 1) {
+                    }
+
+
+                }
+            })
+            /*
+                        var formData = new FormData();
+                        formData.append('name', nameVal);
+                        formData.append('surname', surnameVal);
+            */
+            xhr.send(formData);
+        }
+
+        function edycja(that, magnet) {
+            console.log(fridge.editor)
+            fridge.editor.editorContainer.style.zIndex = fridge.collection.length;
+            fridge.editionInProgess = true;
+            fridge.current = that;
+            fridge.currentMagnet = magnet;
+            fridge.editor.show();
+            fridge.editor.setContent(that.innerHTML)
+        }
+
+        function updatePrzebieg() {
+            document.getElementById('przebieg').innerHTML = fridge.przebieg
+            document.getElementById('actual').innerHTML = fridge.aktaulny
+        }
+
+        function init2(obj) {
+
+            console.log(obj)
+            for (let i = 0; i < obj.collection.length; i++) {
+                fridge.add(true);
+                console.log(obj.collection[i].width)
+                fridge.collection[i].html_element.style.width = obj.collection[i].width
+                fridge.collection[i].html_element.style.height = obj.collection[i].height
+                fridge.collection[i].html_element.style.top = obj.collection[i].y
+                fridge.collection[i].html_element.style.left = obj.collection[i].x
+                fridge.collection[i].html_element.style.zIndex = obj.collection[i].zindex
+                fridge.collection[i].html_element.getElementsByTagName('div')[2].innerHTML = obj.collection[i].content
+
+            }
+
+            fridge.przebieg = obj.przebieg || 0;
+            fridge.aktaulny = fridge.collection.length;
+            updatePrzebieg()
+        }
+
+        function _Magnet(noUpdate = false) {
+            //  this.html_element = null;
+            this.create = function () {
+                if (!noUpdate)
+                    createNewElemento();
+
+                for (let i = 0; i < fridge.multi.length; i++) {
+                    fridge.multi[i].html_element.style.backgroundColor = 'whitesmoke';
+                }
+                fridge.multi = [];
+                if (!noUpdate) {
+                    fridge.aktaulny++;
+                    fridge.przebieg++;
+                }
+                updatePrzebieg()
+                const that = this;
+                const div = document.createElement("div");
+                const edit = document.createElement("div");
+                const text = document.createElement("div");
+                text.style.wordWrap = 'break-word';
+                edit.className = 'edit'
+                edit.addEventListener('click', function () {
+                    edycja(text, that)
+                })
+                const close = document.createElement("div");
+                close.className = 'close'
+                const resize = document.createElement("div");
+                resize.className = 'resize'
+                text.innerHTML = 'NEW JOB';
+                text.className = 'teksiock'
+                div.appendChild(edit);
+                div.appendChild(resize);
+                div.appendChild(text);
+                div.appendChild(close);
+                div.style.width = '200px';
+                div.style.top = '100px';
+                div.style.left = '20px';
+                div.style.height = '200px';
+                div.className = "magnet";
+
+                div.style.zIndex = fridge.collection.length || 0;
+
+                function updateZIndex(kloeck, bufor) {
+                    console.log(bufor)
+                    console.log(div)
+                    for (let i = 0; i < fridge.collection.length; i++) {
+                        if (+fridge.collection[i].html_element.style.zIndex >= +bufor && fridge.collection[i].html_element !== kloeck) {
+                            fridge.collection[i].html_element.style.zIndex--;
+                        }
+                    }
+                }
+
+                close.addEventListener("click", function () {
+                    if (!fridge.editionInProgess) {
+                        fridge.aktaulny--;
+                        updatePrzebieg()
+                        console.log(div)
+                        let index = fridge.collection.indexOf(that);
+                        console.log(index)
+                        console.log(fridge.collection)
+                        fridge.collection.splice(index, 1);
+
+                        console.log(fridge.collection)
+
+                        let bufor = div.style.zIndex
+                        div.style.zIndex = fridge.collection.length - 1;
+                        console.log(fridge.collection.length - 1)
+                        sendDeleteMagnet(fridge.collection.indexOf(that))
+                        updateZIndex(div, bufor);
+                        div.remove();
+
+
+                        //updateZIndex(a);
+
+
+                    }
+                });
+
+
+                resize.addEventListener("mousedown", function (e) {
+                    if (!fridge.editionInProgess) {
+                        let a = e.pageX
+                        let b = e.pageY
+                        let w = parseInt(div.style.width, 10)
+                        let h = parseInt(div.style.height, 10)
+
+
+                        div.removeEventListener('mousedown', clickMove)
+
+                        function resize(e) {
+
+                            if ((w + e.pageX - a) >= 80)
+                                div.style.width = w + e.pageX - a + "px"
+                            else
+                                div.style.width = '80px'
+
+                            if ((h + e.pageY - b) >= 80)
+                                div.style.height = h + e.pageY - b + "px"
+                            else
+                                div.style.height = '80px'
+
+
+                            if (parseInt(div.style.height, 10) < 80 && parseInt(div.style.width, 10) < 80)
+                                window.removeEventListener("mousemove", resize);
+
+
+                        }
+
+                        window.addEventListener("mousemove", resize);
+
+                        function up() {
+                            div.style.cursor = 'grab';
+                            window.removeEventListener("mousemove", resize);
+                            window.removeEventListener("mouseup", up);
+                            div.addEventListener("mousedown", clickMove);
+                            sendUpdateResize(div.style.width, div.style.height, fridge.collection.indexOf(that))
+                        }
+
+                        window.addEventListener("mouseup", up);
+
+                    }
+                })
+                div.addEventListener('mousedown', recolor);
+
+                function recolor() {
+                    if (fridge.multi.length === 0) {
+                        console.log(fridge.multi.length)
+                        if (!fridge.editionInProgess) {
+                            if (fridge.last) {
+                                fridge.last.style.backgroundColor = 'whitesmoke'
+                            }
+                            div.style.backgroundColor = 'darkkhaki';
+                            fridge.last = div;
+
+                            function recolor2() {
+
+                                div.style.backgroundColor = 'whitesmoke';
+                                fridge.last = null;
+                                div.removeEventListener('mouseup', recolor2)
+                            }
+
+                            div.addEventListener('mouseup', recolor2)
+
+
+                        }
+                    }
+                }
+
+                div.addEventListener("mousedown", clickMove);
+
+                function clickMove(e) {
+                    if (!fridge.multi.includes(that)) {
+                        for (let i = 0; i < fridge.multi.length; i++) {
+                            fridge.multi[i].html_element.style.backgroundColor = 'whitesmoke';
+                        }
+                        fridge.multi = [];
+                    }
+
+                    if (fridge.multi.length > 0) {
+                        let tabI = [];
+                        let tab = [];
+                        for (let i = 0; i < fridge.multi.length; i++) {
+                            tab.push({
+                                x: e.pageX - fridge.multi[i].html_element.offsetLeft,
+                                y: e.pageY - fridge.multi[i].html_element.offsetTop
+                            })
+                            tabI.push(fridge.collection.indexOf(fridge.multi[i]))
+                        }
+
+
+                        function move(e) {
+                            for (let i = 0; i < fridge.multi.length; i++) {
+                                fridge.multi[i].html_element.style.left = e.pageX - tab[i].x + "px"
+                                fridge.multi[i].html_element.style.top = e.pageY - tab[i].y + "px"
+                            }
+
+
+                        }
+
+                        window.addEventListener("mousemove", move);
+
+                        function up() {
+                            let tabX = []
+                            let tabY = []
+                            for (let i = 0; i < fridge.multi.length; i++) {
+                                tabX.push(fridge.multi[i].html_element.style.left)
+                                tabY.push(fridge.multi[i].html_element.style.top)
+                            }
+                            moveMulti(tabI, tabX, tabY)
+
+                            div.style.cursor = 'grab';
+                            window.removeEventListener("mousemove", move);
+                            window.removeEventListener("mouseup", up);
+                        }
+
+                        window.addEventListener("mouseup", up);
+
+                    }
+                    else {
+                        if (!fridge.editionInProgess) {
+                            let a = (e.pageX - div.offsetLeft);
+                            let b = (e.pageY - div.offsetTop)
+                            div.style.cursor = 'grabbing';
+                            let bufor = div.style.zIndex
+                            div.style.zIndex = fridge.collection.length - 1;
+                            console.log(fridge.collection.length - 1)
+
+                            updateZIndex(div, bufor);
+
+
+                            function move(e) {
+                                div.style.left = e.pageX - a + "px"
+                                div.style.top = e.pageY - b + "px"
+
+
+                            }
+
+                            window.addEventListener("mousemove", move);
+
+                            function up() {
+                                sendUpdatePos(div.style.left, div.style.top, fridge.collection.indexOf(that))
+                                div.style.cursor = 'grab';
+                                window.removeEventListener("mousemove", move);
+                                window.removeEventListener("mouseup", up);
+                            }
+
+                            window.addEventListener("mouseup", up);
+
+                        }
+                    }
+                }
+
+                this.html_element = div;
+                document.body.appendChild(div);
+            }
+
+            this.create();
+            console.log(fridge)
+        }
+
+        fridge = {
+            collection: [],
+            add: function (noUpdate) {
+                fridge.collection.push(new _Magnet(noUpdate));
+            },
+            editor: null,
+            current: null,
+            editionInProgess: false,
+            aktaulny: 0,
+            przebieg: 0,
+            multi: [],
+            nazwa: '',
+        }
+
+        function init() {
+
+
+            const przebieg = document.createElement("div");
+            const actual = document.createElement("div");
+            const add = document.getElementById('addNewMagnes')
+            add.addEventListener('click', function () {
+                fridge.add(false)
+            })
+            add.style.display = 'block';
+            document.getElementById('szukajka').style.display = 'none';
+            document.getElementById('butonik_szukaj').style.display = 'none';
+
+            przebieg.id = 'przebieg';
+            actual.id = 'actual'
+            przebieg.innerHTML = 0;
+            actual.innerHTML = 0;
+            document.body.appendChild(przebieg)
+            document.body.appendChild(actual)
+
+
+            const canvas = document.getElementById('canvasia')
+            canvas.style.display = 'block';
+            canvas.width = document.body.clientWidth;
+            canvas.height = document.body.clientHeight;
+            canvas.id = 'canvasia'
+
+
+            canvas.addEventListener('mousedown', function (e) {
+                for (let i = 0; i < fridge.multi.length; i++) {
+                    fridge.multi[i].html_element.style.backgroundColor = 'whitesmoke';
+                }
+                fridge.multi = [];
+                canvas.style.zIndex = fridge.collection.length;
+                let fx = e.pageX;
+                let fy = e.pageY;
+
+                function move(e) {
+                    let ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+                    ctx.fillStyle = "rgba(252,98,49,0.5)";
+                    ctx.beginPath();
+                    ctx.lineWidth = "1";
+                    ctx.strokeStyle = "rgba(252,98,49,1)";
+
+
+                    ctx.rect(fx, fy, e.pageX - fx, e.pageY - fy);
+                    ctx.fill();
+                    ctx.stroke();
+
+                }
+
+                canvas.addEventListener('mouseup', up)
+
+                function up(e) {
+                    canvas.style.zIndex = 0
+                    let ctx = canvas.getContext('2d');
+                    canvas.removeEventListener('mouseup', up)
+                    canvas.removeEventListener('mousemove', move)
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let xBig, xSmall, yBig, ySmall;
+
+                    if (fx > e.pageX) {
+                        xBig = fx
+                        xSmall = e.pageX
+                    } else {
+                        xBig = e.pageX
+                        xSmall = fx
+                    }
+                    if (fy > e.pageY) {
+                        yBig = fy
+                        ySmall = e.pageY
+                    } else {
+                        yBig = e.pageY
+                        ySmall = fy
+                    }
+
+                    for (let i = 0; i < fridge.collection.length; i++) {
+                        let x1 = fridge.collection[i].html_element.offsetLeft
+                        let y1 = fridge.collection[i].html_element.offsetTop
+                        let x2 = x1 + parseInt(fridge.collection[i].html_element.style.width)
+                        let y2 = y1 + parseInt(fridge.collection[i].html_element.style.height)
+
+
+                        if (x1 < xBig && x2 > xSmall && y1 < yBig && y2 > ySmall) {
+                            fridge.multi.push(fridge.collection[i])
+                            fridge.collection[i].html_element.style.backgroundColor = 'darkkhaki';
+                        }
+
+
+                    }
+
+
+                }
+
+                canvas.addEventListener('mousemove', move)
+            })
+            //document.body.appendChild(canvas)
+            document.body.appendChild(add)
+            const dialog = document.createElement("textarea");
+            dialog.className = 'dialog'
+            document.body.appendChild(dialog);
+            tinymce.init({
+                selector: '.dialog',
+                resize: "both",
+                width: 600,
+                height: 300,
+                init_instance_callback: function (editor) {
+                    fridge.editor = editor;
+                    editor.hide();
+                    const save = document.createElement("div");
+                    save.className = 'saveButton';
+
+                    const exit = document.createElement("div");
+                    exit.className = 'exitButton';
+                    exit.addEventListener('click', function () {
+                        fridge.editor.hide();
+                        fridge.editionInProgess = false;
+                    })
+                    save.addEventListener('click', function () {
+                        fridge.editionInProgess = false;
+                        fridge.current.innerHTML = editor.getContent()
+                        fridge.editor.hide();
+                        sendUpdateContent(fridge.current.innerHTML, fridge.collection.indexOf(fridge.currentMagnet))
+                    })
+                    const panel = document.getElementsByClassName('mce-container-body')[0];
+
+                    panel.appendChild(save);
+                    panel.appendChild(exit);
+                }
+
+            });
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            let guzik = document.getElementById('butonik_szukaj')
+            guzik.addEventListener('click', function () {
+                let value = document.getElementById('szukajka').value
+                console.log(value)
+                let x = {};
+                x.action = 0;
+                x.nazwa = value
+                fridge.nazwa = value;
+                console.log(x)
+                callAJAX(x, 0);
+
+            })
+
+        })
+    </script>
+</head>
+
+<body>
+<input type="text" id="szukajka">
+<div id="butonik_szukaj"> Go</div>
+<canvas id="canvasia" style="z-index: 0;"></canvas>
+<div id="addNewMagnes" style="z-index: 100">Dodaj</div>
+</body>
+
+</html>
