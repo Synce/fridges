@@ -4,6 +4,7 @@ var qs = require("querystring")
 var path = require("path")
 var Nedb = require('nedb')
 var express = require("express")
+const PORT = process.env.PORT || 8080
 
 var app = express();
 app.use(bodyParser.json()); // for parsing application/json
@@ -173,6 +174,6 @@ app.get("/*", function (req, res) {
 })
 
 
-app.listen(3000, function () {
+app.listen(PORT, function () {
     console.log("start serwera na porcie ")
 })
