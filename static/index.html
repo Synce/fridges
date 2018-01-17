@@ -14,6 +14,7 @@
             position: absolute;
             cursor: grab;
             background-color: whitesmoke;
+            overflow: hidden;
         }
 
         .close {
@@ -157,6 +158,7 @@
             padding: 20px;
             width: 100%;
             height: 100%;
+
         }
     </style>
     <script type="text/javascript" src="js/tinymce.min.js">
@@ -359,7 +361,7 @@
                         let bufor = div.style.zIndex
                         div.style.zIndex = fridge.collection.length - 1;
                         console.log(fridge.collection.length - 1)
-                        sendDeleteMagnet(fridge.collection.indexOf(that))
+                        sendDeleteMagnet(index)
                         updateZIndex(div, bufor);
                         div.remove();
 

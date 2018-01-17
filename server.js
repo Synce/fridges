@@ -72,13 +72,17 @@ app.post("/odbierz", function (req, res) {
 })
 
 function deleteMagneto(finish, res) {
-    console.log()
+    console.log(finish)
     dane.findOne({nazwa: finish.nazwa}, function (err, doc) {
-
-
+        let obj = doc.collection[finish.i];
+        let bufor = obj.zindex;
+        obj.zindex = doc.collection.length - 1;
+        doc.collection[finish.i] = obj;
+        doc = updateZIndex(obj, bufor, doc)
         doc.collection.splice(finish.i, 1)
         dane.update({_id: doc._id}, doc, {}, function (err, numReplaced) {
 
+            res.end(JSON.stringify({}));
         });
 
     })
@@ -94,7 +98,7 @@ function moveMultiMagneto(finish, res) {
 
 
         dane.update({_id: doc._id}, doc, {}, function (err, numReplaced) {
-            res.end(JSON.stringify(doc));
+            res.end(JSON.stringify({}));
         });
 
     })
@@ -115,7 +119,7 @@ function newMagneto(finish, res) {
 
         doc.collection.push(obj)
         dane.update({_id: doc._id}, doc, {}, function (err, numReplaced) {
-            res.end(JSON.stringify(doc));
+            res.end(JSON.stringify({}));
         });
 
     })
@@ -155,11 +159,8 @@ function updateContent(finish, res) {
         doc = updateZIndex(obj, bufor, doc)
         dane.update({_id: doc._id}, doc, {}, function (err, numReplaced) {
             console.log('updated')
-            // numReplaced = 1
-            // The doc #3 has been replaced by { _id: 'id3', planet: 'Pluton' }
-            // Note that the _id is kept unchanged, and the document has been replaced
-            // (the 'system' and inhabited fields are not here anymore)
-            res.end(JSON.stringify(doc));
+
+            res.end(JSON.stringify({}));
         });
 
 
